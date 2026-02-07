@@ -1,20 +1,30 @@
+---
+
+## 🖐️ HandShare AI - @ya_rositt
+Aplikasi **Telekinesis Data** pertama kamu! Kirim foto hanya dengan gerakan telapak tangan menggunakan AI Sensor.
+
+### 🌐 [KLIK UNTUK COBA APLIKASI](https://ya-rositt.github.io/NAMA-REPO-KAMU-DI-SINI/)
+*(Ganti link di atas dengan link GitHub Pages kamu)*
+
+---
+
+### 🛠️ Fitur Utama
+* **AI Gesture Detection**: Menggunakan MediaPipe untuk mendeteksi telapak tangan.
+* **P2P Fast Transfer**: Kirim gambar langsung antar HP tanpa server perantara.
+* **Radar Wave UI**: Efek gelombang estetik saat aplikasi aktif.
+* **Watermarked**: Developed by **@ya_rositt**.
+
+### 📖 Cara Bermain
+1.  Siapkan dua HP dan buka link di atas (Wajib **HTTPS**).
+2.  Salin **ID Teman** dan klik **AKTIFKAN RADAR**.
+3.  Pilih foto dari galeri HP kamu.
+4.  Arahkan telapak tangan terbuka (**🖐️**) ke kamera depan.
+5.  **BOOM!** Foto kamu akan terlempar ke HP teman secara otomatis.
+
+---
 <p align="center">
-  <img src="https://capsule-render.vercel.app/api?type=waving&color=00c6ff&height=120&section=header&text=HandShare%20AI&fontSize=50&animation=fadeIn&fontAlignY=35">
+  Connect with me: <br>
+  <a href="https://instagram.com/ya_rositt">
+    <img src="https://img.shields.io/badge/Instagram-%23E4405F.svg?style=for-the-badge&logo=Instagram&logoColor=white">
+  </a>
 </p>
-
-<p align="center">
-  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="300">
-</p>
-# 🖐️ HandShare AI - @ya_rositt
-
-Project aplikasi transfer gambar menggunakan **AI Gesture Recognition** (MediaPipe) dan **P2P Connection** (PeerJS).
-
-### 🚀 [COBA APLIKASI DI SINI](PASTE_LINK_KAMU_DISINI)
-
-**Cara Pakai:**
-1. Buka link di dua HP (Wajib HTTPS).
-2. Hubungkan menggunakan ID yang tertera.
-3. Pilih gambar dari galeri.
-4. **Buka telapak tangan (🖐️)** ke arah kamera untuk melempar gambar ke HP sebelah!
-
-**Developed by:** [@ya_rositt](https://instagram.com/ya_rositt)
