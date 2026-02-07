@@ -10,87 +10,108 @@
     <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
 
     <style>
-        :root { --neon: #00c6ff; }
+        :root { --neon: #00c6ff; --deep: #0072ff; }
+        
         body { 
-            margin: 0; background: #0a0a12; color: white; 
-            font-family: 'Segoe UI', sans-serif; display: flex; 
-            flex-direction: column; align-items: center; justify-content: center; 
-            height: 100vh; overflow: hidden;
+            margin: 0; background: radial-gradient(circle at center, #0a0a1a 0%, #000 100%); 
+            color: white; font-family: 'Segoe UI', sans-serif; height: 100vh; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            overflow: hidden;
         }
 
-        /* Video Preview Kecil (Sensor) */
+        /* Animasi BG Bergerak */
+        body::before {
+            content: ""; position: absolute; width: 200%; height: 200%;
+            background: conic-gradient(from 0deg at 50% 50%, transparent, var(--neon), transparent);
+            animation: rotateBG 10s linear infinite; opacity: 0.05; z-index: -1;
+        }
+        @keyframes rotateBG { 100% { transform: rotate(360deg); } }
+
+        /* Video Preview */
         #input_video { 
-            transform: scaleX(-1); width: 100px; height: 75px; 
+            transform: scaleX(-1); width: 100px; height: 80px; 
             border-radius: 12px; border: 2px solid var(--neon); 
             position: absolute; top: 15px; left: 15px; object-fit: cover;
             box-shadow: 0 0 15px var(--neon); z-index: 20;
         }
 
-        /* Foto dengan Animasi Gelombang */
         #photo-container {
-            position: relative; display: none;
-            width: 280px; height: 400px;
+            position: relative; display: none; width: 280px; height: 400px;
+            perspective: 1000px;
         }
 
         #photo { 
-            width: 100%; height: 100%; background: #222; 
+            width: 100%; height: 100%; background: #111; 
             border: 3px solid var(--neon); border-radius: 25px; 
             background-size: cover; background-position: center;
-            position: relative; z-index: 10;
+            position: relative; z-index: 10; box-shadow: 0 0 30px rgba(0,198,255,0.3);
         }
 
-        /* Efek Gelombang Jalan Terus */
         .wave {
             position: absolute; top: 0; left: 0; right: 0; bottom: 0;
             border: 2px solid var(--neon); border-radius: 25px;
             animation: pulse 2s infinite; opacity: 0;
         }
         @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.5; }
-            100% { transform: scale(1.2); opacity: 0; }
+            0% { transform: scale(1); opacity: 0.6; }
+            100% { transform: scale(1.4); opacity: 0; }
         }
 
-        /* Panel Setup */
+        /* Flash Screen */
+        #flash {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: white; opacity: 0; pointer-events: none; z-index: 100;
+        }
+
         #setup { 
-            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px);
-            padding: 30px; border-radius: 25px; text-align: center; 
-            width: 85%; max-width: 320px; border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255, 255, 255, 0.07); backdrop-filter: blur(25px);
+            padding: 30px; border-radius: 30px; text-align: center; 
+            width: 85%; max-width: 320px; border: 1px solid rgba(255,255,255,0.15);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
-        .id-badge { color: var(--neon); font-weight: bold; font-family: monospace; font-size: 1.4em; }
+        .id-badge { 
+            color: var(--neon); font-weight: 900; font-family: 'Monaco', monospace; 
+            font-size: 2.8em; letter-spacing: 4px; text-shadow: 0 0 15px var(--neon);
+        }
+
         input { 
-            width: 90%; padding: 12px; margin: 15px 0; border-radius: 10px; 
-            border: none; background: rgba(0,0,0,0.5); color: white; text-align: center;
+            width: 90%; padding: 12px; margin: 15px 0; border-radius: 12px; 
+            border: 1px solid var(--neon); background: rgba(0,0,0,0.4); color: white; 
+            text-align: center; font-size: 1.1em;
         }
 
         button { 
-            background: linear-gradient(90deg, #00c6ff, #0072ff);
-            color: white; border: none; padding: 15px; border-radius: 12px; 
-            font-weight: bold; width: 100%; cursor: pointer; text-transform: uppercase;
+            background: linear-gradient(45deg, var(--neon), var(--deep));
+            color: white; border: none; padding: 16px; border-radius: 12px; 
+            font-weight: bold; width: 100%; cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,198,255,0.4); transition: 0.3s;
         }
+        button:active { transform: scale(0.95); }
 
         #status-bar {
-            position: absolute; bottom: 60px; font-size: 12px;
-            background: rgba(0, 198, 255, 0.1); padding: 8px 20px;
+            position: absolute; bottom: 60px; font-size: 10px;
+            background: rgba(0, 0, 0, 0.6); padding: 8px 20px;
             border-radius: 30px; border: 1px solid var(--neon);
-            letter-spacing: 1px;
+            text-transform: uppercase; letter-spacing: 2px;
         }
 
-        .watermark { position: absolute; bottom: 15px; right: 15px; font-size: 10px; opacity: 0.5; letter-spacing: 2px; }
+        .watermark { position: absolute; bottom: 15px; right: 15px; font-size: 10px; opacity: 0.5; letter-spacing: 3px; font-weight: bold;}
     </style>
 </head>
 <body>
 
+    <div id="flash"></div>
     <video id="input_video" autoplay playsinline></video>
-    <div id="status-bar">MENGINISIALISASI AI...</div>
-    <div class="watermark">POWERED BY @YA_ROSITT</div>
+    <div id="status-bar">SYSTEM BOOTING...</div>
+    <div class="watermark">@YA_ROSITT</div>
 
     <div id="setup">
-        <h2 style="margin:0; letter-spacing: 2px;">HAND SHARE</h2>
-        <p style="font-size: 0.8em; opacity: 0.7;">ID Kamu:</p>
-        <span id="my-id" class="id-badge">...</span>
-        <input type="text" id="target-id" placeholder="MASUKKAN ID TEMAN">
-        <button onclick="connectToPeer()">AKTIFKAN RADAR</button>
+        <h2 style="margin:0; letter-spacing: 4px; color: var(--neon);">SWIPE AI</h2>
+        <p style="font-size: 0.7em; opacity: 0.6; margin: 10px 0 0 0;">YOUR TRANSMISSION ID:</p>
+        <span id="my-id" class="id-badge">....</span>
+        <input type="text" id="target-id" placeholder="TARGET ID (4 DIGIT)">
+        <button onclick="connectToPeer()">INITIATE RADAR</button>
     </div>
 
     <div id="photo-container">
@@ -100,26 +121,44 @@
     </div>
 
     <input type="file" id="fileInput" accept="image/*" style="display: none;">
-    <button id="fileBtn" style="display: none; margin-top: 20px; width: 200px;" onclick="document.getElementById('fileInput').click()">PILIH FOTO</button>
+    <button id="fileBtn" style="display: none; margin-top: 25px; width: 240px;" onclick="document.getElementById('fileInput').click()">SELECT IMAGE</button>
 
     <script>
         const videoElement = document.getElementById('input_video');
         const photo = document.getElementById('photo');
         const photoContainer = document.getElementById('photo-container');
         const statusBar = document.getElementById('status-bar');
-        const peer = new Peer();
+        const flash = document.getElementById('flash');
+        
         let conn;
         let isSending = false;
 
-        // 1. PeerJS - Koneksi antar HP
-        peer.on('open', id => { 
-            document.getElementById('my-id').innerText = id;
-            statusBar.innerText = "SENSOR READY. MASUKKAN ID.";
-        });
+        // Audio Synth (Tanpa file mp3)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playSound(freq, type) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+        }
+
+        function makeShortId(length) {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let res = '';
+            for (let i = 0; i < length; i++) res += chars.charAt(Math.floor(Math.random() * chars.length));
+            return res;
+        }
+
+        const peer = new Peer(makeShortId(4));
+        peer.on('open', id => { document.getElementById('my-id').innerText = id; statusBar.innerText = "READY TO SYNC"; });
+        peer.on('error', (err) => { if(err.type === 'unavailable-id') window.location.reload(); });
 
         function connectToPeer() {
-            const tid = document.getElementById('target-id').value;
-            if(!tid) return alert("Isi ID dulu!");
+            const tid = document.getElementById('target-id').value.toUpperCase();
+            if(!tid) return;
             conn = peer.connect(tid);
             setupConn();
         }
@@ -128,65 +167,57 @@
 
         function setupConn() {
             conn.on('open', () => {
+                playSound(880, 'sine');
                 document.getElementById('setup').style.display = 'none';
                 document.getElementById('fileBtn').style.display = 'block';
                 photoContainer.style.display = 'block';
-                statusBar.innerText = "TERHUBUNG! BUKA TELAPAK TANGAN UNTUK KIRIM.";
+                statusBar.innerText = "LINK ESTABLISHED. HAND READY.";
                 startAI();
             });
-
             conn.on('data', (data) => {
                 if(data.type === 'img') {
+                    playSound(660, 'square');
                     photo.style.backgroundImage = `url(${data.val})`;
-                    photo.style.transform = "scale(0) translateY(100px)";
+                    photo.style.transform = "scale(0) rotate(-20deg)";
                     setTimeout(() => {
-                        photo.style.transition = "all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
-                        photo.style.transform = "scale(1) translateY(0)";
+                        photo.style.transition = "all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
+                        photo.style.transform = "scale(1) rotate(0deg)";
                     }, 50);
-                    statusBar.innerText = "FOTO DITERIMA! 📥";
                 }
             });
         }
 
-        // 2. MediaPipe AI - Deteksi Tangan
         function onResults(results) {
             if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
                 const lm = results.multiHandLandmarks[0];
-                
-                // Logika: Jari telunjuk (8) dan Tengah (12) lebih tinggi dari sendinya (6, 10)
                 const isHandOpen = lm[8].y < lm[6].y && lm[12].y < lm[10].y;
 
-                if (isHandOpen && !isSending) {
-                    statusBar.innerText = "TANGAN TERDETEKSI! MELEMPAR...";
-                    sendData();
+                if (isHandOpen && !isSending && photo.style.backgroundImage) {
+                    isSending = true;
+                    if(navigator.vibrate) navigator.vibrate(100);
+                    playSound(1200, 'sawtooth');
+                    
+                    // Flash Effect
+                    flash.style.opacity = "0.8";
+                    setTimeout(() => flash.style.opacity = "0", 150);
+
+                    conn.send({ type: 'img', val: photo.style.backgroundImage.slice(5, -2) });
+                    
+                    photo.style.transition = "all 0.6s cubic-bezier(0.455, 0.03, 0.515, 0.955)";
+                    photo.style.transform = "translateY(-1000px) scale(0) rotate(20deg)";
+                    
+                    setTimeout(() => {
+                        photo.style.transition = "none";
+                        photo.style.transform = "translateY(0) scale(1) rotate(0deg)";
+                        isSending = false;
+                        statusBar.innerText = "TRANSMISSION SUCCESS";
+                    }, 1200);
                 }
-            }
-        }
-
-        function sendData() {
-            const bg = photo.style.backgroundImage;
-            if(bg && conn) {
-                isSending = true;
-                const base64 = bg.slice(5, -2);
-                conn.send({ type: 'img', val: base64 });
-                
-                // Animasi Lempar ke Atas
-                photo.style.transition = "all 0.5s ease-in";
-                photo.style.transform = "translateY(-600px) scale(0) rotate(15deg)";
-                photo.style.opacity = "0";
-
-                setTimeout(() => {
-                    photo.style.transition = "none";
-                    photo.style.transform = "translateY(0) scale(1) rotate(0deg)";
-                    photo.style.opacity = "1";
-                    isSending = false;
-                    statusBar.innerText = "FOTO TERKIRIM! 🚀";
-                }, 1500);
             }
         }
 
         const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.6, minTrackingConfidence: 0.6 });
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
         hands.onResults(onResults);
 
         function startAI() {
@@ -197,15 +228,14 @@
             camera.start();
         }
 
-        // 3. File Handler
         document.getElementById('fileInput').onchange = (e) => {
             const reader = new FileReader();
             reader.onload = (ev) => { 
                 photo.style.backgroundImage = `url(${ev.target.result})`;
-                statusBar.innerText = "FOTO SIAP. LEMPAR SEKARANG! 🖐️";
+                statusBar.innerText = "DATA LOADED. SWIPE TO SEND.";
             };
             reader.readAsDataURL(e.target.files[0]);
         };
     </script>
 </body>
-    </html>
+            </html>
