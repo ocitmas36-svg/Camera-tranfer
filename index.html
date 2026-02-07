@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>HandShare AI - @ya_rositt</title>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
+
+    <style>
+        body { 
+            margin: 0; background: #050505; color: white; 
+            font-family: 'Segoe UI', sans-serif; display: flex; 
+            flex-direction: column; align-items: center; justify-content: center; 
+            height: 100vh; overflow: hidden; 
+        }
+
+        /* Video Preview Kecil untuk AI */
+        #input_video { transform: scaleX(-1); width: 120px; height: 90px; border-radius: 10px; border: 2px solid #00c6ff; position: absolute; top: 10px; left: 10px; object-fit: cover; }
+
+        #photo { 
+            width: 280px; height: 400px; background: #222; 
+            border: 3px solid #00c6ff; border-radius: 20px; 
+            box-shadow: 0 0 50px rgba(0, 198, 255, 0.5);
+            display: none; background-size: cover; background-position: center;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #setup { background: rgba(20,20,30,0.9); padding: 25px; border-radius: 20px; text-align: center; width: 80%; border: 1px solid #333; }
+        .id-badge { color: #00c6ff; font-weight: bold; font-size: 1.2em; }
+        input { width: 80%; padding: 10px; margin: 10px 0; border-radius: 8px; border: none; background: #222; color: white; text-align: center; }
+        button { background: #00c6ff; color: black; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; }
+        
+        .watermark { position: absolute; bottom: 10px; right: 10px; font-size: 10px; opacity: 0.5; }
+        .gesture-status { position: absolute; bottom: 50px; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; font-size: 12px; border: 1px solid #00c6ff; }
+    </style>
+</head>
+<body>
+
+    <video id="input_video" autoplay playsinline></video>
+    <div class="watermark">AI POWERED BY @YA_ROSITT</div>
+    <div id="gesture_info" class="gesture-status">AI Menunggu Tangan...</div>
+
+    <div id="setup">
+        <h2>GESTURE SHARE</h2>
+        <p>ID Kamu: <span id="my-id" class="id-badge">...</span></p>
+        <input type="text" id="target-id" placeholder="ID Teman">
+        <button onclick="connectToPeer()">AKTIFKAN SENSOR</button>
+    </div>
+
+    <div id="photo"></div>
+    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+    <button id="fileBtn" style="display: none; margin-top: 15px;" onclick="document.getElementById('fileInput').click()">PILIH GAMBAR</button>
+
+    <script>
+        const videoElement = document.getElementById('input_video');
+        const photo = document.getElementById('photo');
+        const info = document.getElementById('gesture_info');
+        const peer = new Peer();
+        let conn;
+        let canSend = true;
+
+        // 1. PeerJS Setup
+        peer.on('open', id => { document.getElementById('my-id').innerText = id; });
+
+        function connectToPeer() {
+            const tid = document.getElementById('target-id').value;
+            conn = peer.connect(tid);
+            setupConn();
+        }
+
+        peer.on('connection', (c) => { conn = c; setupConn(); });
+
+        function setupConn() {
+            conn.on('open', () => {
+                document.getElementById('setup').style.display = 'none';
+                document.getElementById('fileBtn').style.display = 'block';
+                photo.style.display = 'block';
+                startAI();
+            });
+
+            conn.on('data', (data) => {
+                if(data.type === 'img') {
+                    photo.style.backgroundImage = `url(${data.val})`;
+                    photo.style.transform = "scale(0) rotate(-20deg)";
+                    info.innerText = "MENANGKAP GAMBAR!";
+                    setTimeout(() => { photo.style.transform = "scale(1) rotate(0deg)"; }, 100);
+                }
+            });
+        }
+
+        // 2. AI Hand Tracking Logic
+        function onResults(results) {
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const landmarks = results.multiHandLandmarks[0];
+                
+                // Cek apakah jari telunjuk dan tengah tegak (tangan terbuka)
+                const isHandOpen = landmarks[8].y < landmarks[6].y && landmarks[12].y < landmarks[10].y;
+
+                if (isHandOpen) {
+                    info.innerText = "Tangan Terdeteksi: TERBUKA 🖐️";
+                    info.style.color = "#00c6ff";
+                    
+                    // Trigger kirim jika ada gambar
+                    const bg = photo.style.backgroundImage;
+                    if(bg && conn && canSend) {
+                        const base64 = bg.slice(5, -2);
+                        conn.send({ type: 'img', val: base64 });
+                        
+                        // Animasi lempar
+                        photo.style.transform = "translateY(-500px) scale(0) rotate(20deg)";
+                        canSend = false;
+                        info.innerText = "GAMBAR TERLEMPAR! 🚀";
+                        setTimeout(() => { 
+                            photo.style.transform = "translateY(0) scale(1)"; 
+                            canSend = true;
+                        }, 2000);
+                    }
+                } else {
+                    info.innerText = "Tangan Mengepal ✊";
+                    info.style.color = "white";
+                }
+            }
+        }
+
+        const hands = new Hands({locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+        hands.onResults(onResults);
+
+        function startAI() {
+            const camera = new Camera(videoElement, {
+                onFrame: async () => { await hands.send({image: videoElement}); },
+                width: 640, height: 480
+            });
+            camera.start();
+            info.innerText = "Sensor AI Aktif!";
+        }
+
+        document.getElementById('fileInput').onchange = (e) => {
+            const reader = new FileReader();
+            reader.onload = (ev) => { photo.style.backgroundImage = `url(${ev.target.result})`; };
+            reader.readAsDataURL(e.target.files[0]);
+        };
+    </script>
+</body>
+  </html>
