@@ -1,29 +1,36 @@
+<p align="center">
+  <img src="https://capsule-render.vercel.app/api?type=waving&color=00c6ff&height=120&section=header&text=HandShare%20AI&fontSize=50&animation=fadeIn&fontAlignY=35">
+</p>
+
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="300">
+</p>
+
 ---
 
 ## 🖐️ HandShare AI - @ya_rositt
-Aplikasi **Telekinesis Data** pertama kamu! Kirim foto hanya dengan gerakan telapak tangan menggunakan AI Sensor.
+Kirim foto secara magic menggunakan **AI Gesture Recognition**!
 
-### 🌐 [KLIK UNTUK COBA APLIKASI](https://ya-rositt.github.io/NAMA-REPO-KAMU-DI-SINI/)
-*(Ganti link di atas dengan link GitHub Pages kamu)*
+### 🚀 [COBA APLIKASI DI SINI](https://ocitmas36-svg.github.io/swipe-share-app/)
 
 ---
 
 ### 🛠️ Fitur Utama
-* **AI Gesture Detection**: Menggunakan MediaPipe untuk mendeteksi telapak tangan.
-* **P2P Fast Transfer**: Kirim gambar langsung antar HP tanpa server perantara.
-* **Radar Wave UI**: Efek gelombang estetik saat aplikasi aktif.
+* **AI Sensor**: Mendeteksi gerakan telapak tangan secara real-time.
+* **P2P Transfer**: Koneksi langsung tanpa server, lebih cepat dan privat.
+* **Waving UI**: Animasi gelombang radar biru estetik.
 * **Watermarked**: Developed by **@ya_rositt**.
 
-### 📖 Cara Bermain
-1.  Siapkan dua HP dan buka link di atas (Wajib **HTTPS**).
-2.  Salin **ID Teman** dan klik **AKTIFKAN RADAR**.
-3.  Pilih foto dari galeri HP kamu.
-4.  Arahkan telapak tangan terbuka (**🖐️**) ke kamera depan.
-5.  **BOOM!** Foto kamu akan terlempar ke HP teman secara otomatis.
+### 📖 Cara Pakai
+1. Buka link di atas pada dua HP yang berbeda (Wajib HTTPS).
+2. Masukkan **ID Teman** lalu klik **HUBUNGKAN SENSOR**.
+3. Pilih foto dari galeri kamu.
+4. **Buka telapak tangan (🖐️)** ke arah kamera depan untuk melempar foto!
 
 ---
+
 <p align="center">
-  Connect with me: <br>
+  Connect with me: <br><br>
   <a href="https://instagram.com/ya_rositt">
     <img src="https://img.shields.io/badge/Instagram-%23E4405F.svg?style=for-the-badge&logo=Instagram&logoColor=white">
   </a>
